@@ -1,59 +1,107 @@
 <!DOCTYPE html>
-<html>
- <head>
-  <title>CSV File to HTML Table Using AJAX jQuery</title>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
- </head>
- <body>
-  <div class="container">
-   <div class="table-responsive">
-    <h1 align="center">CSV File to HTML Table Using AJAX jQuery</h1>
-    <br />
-    <div align="center">
-     <button type="button" name="load_data" id="load_data" class="btn btn-info">Load Data</button>
-    </div>
-    <br />
-    <div id="employee_table">
-    </div>
-   </div>
-  </div>
- </body>
-</html>
 
-<script>
-$(document).ready(function(){
- $('#load_data').click(function(){
-  $.ajax({
-   url:"employee.csv",
-   dataType:"text",
-   success:function(data)
-   {
-    var employee_data = data.split(/\r?\n|\r/);
-    var table_data = '<table class="table table-bordered table-striped">';
-    for(var count = 0; count<employee_data.length; count++)
-    {
-     var cell_data = employee_data[count].split(",");
-     table_data += '<tr>';
-     for(var cell_count=0; cell_count<cell_data.length; cell_count++)
-     {
-      if(count === 0)
-      {
-       table_data += '<th>'+cell_data[cell_count]+'</th>';
-      }
-      else
-      {
-       table_data += '<td>'+cell_data[cell_count]+'</td>';
-      }
-     }
-     table_data += '</tr>';
-    }
-    table_data += '</table>';
-    $('#employee_table').html(table_data);
-   }
-  });
- });
- 
-});
-</script>
+<html>
+    <head>
+        <title>Import csv file with jquery</title>
+        <meta charset="utf-8" />
+        <style>
+            #container,#buttondiv{
+                margin:0 auto;
+                width:80%;
+                overflow:auto;
+            }
+            table.gridtable {
+                margin:0 auto;
+                width:95%;
+                overflow:auto;
+                font-family: helvetica,arial,sans-serif;
+                font-size:14px;
+                color:#333333;
+                border-width: 1px;
+                border-color: #666666;
+                border-collapse: collapse;
+                text-align: center;
+            }
+            table.gridtable th {
+                border-width: 1px;
+                padding: 8px;
+                border-style: solid;
+                border-color: #666666;
+                background-color: #F6B4A5;
+            }
+            table.gridtable td {
+                border-width: 1px;
+                padding: 8px;
+                border-style: solid;
+                border-color: #666666;
+            }
+            .badrowcount {
+              background-color: coral;
+            }
+            .notnumeric {
+              background-color: yellow;
+            }
+   </style>
+    </head>
+
+    <body>
+      <div id="buttondiv">
+        <input type="file" id="inputfile" />
+        <input type="button" id="viewfile" value="Import file" />
+        <br><br>
+      </div>
+      <div class="container" id="container">
+        <table class="gridtable" id="tableMain">
+            <thead>
+              <tr class="tableheader">
+                  <th>column1</th>
+                  <th>column2</th>
+                  <th>column3</th>
+                  <th>column4</th>
+              </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+          </table>
+      </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+    <script>
+        $( document ).ready(function() {
+
+            $('#viewfile').click(function () {
+                var rdr = new FileReader();
+                rdr.onload = function (e) {
+                  //get the rows into an array
+                  var therows = e.target.result.split("\n");
+                  //loop through the rows
+                  for (var row = 0; row < therows.length; row  ) {
+                    //build a new table row
+                    var newrow = "";
+                    //get the columns into an array
+                    var columns = therows[row].split(",");
+                    //get number of columns
+                    var colcount=columns.length;
+                    if(colcount!=4) {
+                        //incorrect number of columns
+                        newrow="<tr class='badrowcount'><td>incorrect number of columns</td><td></td><td></td><td></td></tr>"
+                    } else {					
+						newrow="<tr><td>"   columns[0]   "</td><td>"   columns[1]   "</td><td>"   columns[2]   "</td>";
+                        if($.isNumeric(columns[3])) {
+                            newrow  = "<td>"   columns[3]   "</td></tr>";
+                        }else {
+                            newrow  = "<td class='notnumeric'>"   columns[3]   "</td></tr>";
+                        }						
+					}
+					$('#tableMain').append(newrow);						
+				  }
+                }
+                rdr.readAsText($("#inputfile")[0].files[0]);
+            });
+    });
+    </script>
+
+    </body>
+</html>
